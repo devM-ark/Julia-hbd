@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Julia's Birthday Countdown</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Patrick+Hand&display=swap');
+
+    :root {
+      --cream: #fff8f0;
+      --pink: #f6a6b8;
+      --dark-pink: #b85b78;
+      --lavender: #d7c1f0;
+      --mint: #c7e8dc;
+      --yellow: #ffe2a6;
+      --ink: #68485b;
+      --paper: #fffdf8;
+      --shadow: 0 14px 35px rgba(120, 76, 96, 0.13);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Comfortaa", sans-serif;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 6% 10%, #ffe0e7 0 9%, transparent 9.5%),
+        radial-gradient(circle at 95% 38%, #e4daf8 0 11%, transparent 11.5%),
+        var(--cream);
+    }
+
+    button { border: 0; cursor: pointer; font: inherit; }
+
+    .page {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 50px 6% 90px;
+    }
+
+    .doodle {
+      position: absolute;
+      opacity: 0.65;
+      pointer-events: none;
+      user-select: none;
+    }
+    .heart { font-size: 2.4rem; animation: float 4s ease-in-out infinite; }
+    .star { font-size: 2rem; color: #eab65e; animation: twinkle 2s ease-in-out infinite; }
+
+    /* hero + countdown */
+    .hero { position: relative; text-align: center; padding: 30px 0 6px; }
+
+    .hero h1 {
+      font-family: "Patrick Hand", cursive;
+      font-size: clamp(3rem, 10vw, 5.8rem);
+      line-height: 0.95;
+      color: var(--dark-pink);
+      margin: 0 0 14px;
+    }
+    .hero h1 span { color: #e48ba4; }
+
+    .hero .sub { margin: 0 auto 28px; max-width: 460px; line-height: 1.9; }
+
+    .cd-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+
+    .cd-tile {
+      width: 100px;
+      padding: 20px 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: var(--paper);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .cd-num {
+      font-family: "Patrick Hand", cursive;
+      font-size: 3.2rem;
+      line-height: 1;
+      color: var(--dark-pink);
+    }
+    .cd-label {
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .count-note { margin: 22px 0 0; font-size: 0.88rem; color: var(--dark-pink); min-height: 1.4em; }
+
+    /* cards */
+    .card {
+      position: relative;
+      max-width: 640px;
+      margin: 38px auto 0;
+      padding: 36px 7% 32px;
+      background: var(--paper);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      font-family: "Patrick Hand", cursive;
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      line-height: 1;
+      color: var(--dark-pink);
+      margin: 0 0 12px;
+    }
+    .card.center { text-align: center; }
+    .card p { line-height: 1.9; margin: 0; }
+    .fine { font-size: 0.82rem; opacity: 0.85; margin-bottom: 22px !important; }
+
+    label { display: block; margin-bottom: 16px; font-size: 0.85rem; }
+
+    input, textarea {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 13px 15px;
+      border: 2px dashed #e3b3c3;
+      border-radius: 12px;
+      font: inherit;
+      color: var(--ink);
+      background: #fffafd;
+    }
+    input:focus, textarea:focus { outline: none; border-color: var(--dark-pink); }
+    textarea { min-height: 170px; resize: vertical; line-height: 1.7; }
+
+    .form-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+    #counter { font-size: 0.78rem; opacity: 0.65; }
+
+    .primary-btn {
+      background: var(--dark-pink);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 999px;
+      box-shadow: 0 8px 0 rgba(128, 55, 81, 0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .primary-btn:hover { transform: translateY(-3px); box-shadow: 0 11px 0 rgba(128, 55, 81, 0.15); }
+    .primary-btn:active { transform: translateY(2px); box-shadow: 0 4px 0 rgba(128, 55, 81, 0.15); }
+    .primary-btn:disabled { opacity: 0.65; cursor: default; transform: none; }
+
+    .note { min-height: 1.5em; margin: 16px 0 0 !important; font-size: 0.85rem; line-height: 1.7; }
+    .note.ok { color: #3f7d63; }
+    .note.err { color: #a8324f; }
+
+    /* read-only wall of messages */
+    .wall-title {
+      text-align: center;
+      font-family: "Patrick Hand", cursive;
+      font-size: clamp(2.6rem, 7vw, 4rem);
+      color: #73547b;
+      margin: 56px 0 6px;
+    }
+    .wall-sub { text-align: center; margin: 0; line-height: 1.8; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 30px 24px;
+      align-items: start;
+      margin-top: 38px;
+    }
+
+    .msg {
+      position: relative;
+      margin: 0;
+      padding: 32px 22px 22px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      transform: rotate(var(--tilt, 0deg));
+    }
+    .msg::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 30%;
+      width: 40%;
+      height: 24px;
+      background: var(--tape, #f5aaba);
+      opacity: 0.85;
+      transform: rotate(-3deg);
+    }
+    .msg h3 {
+      font-family: "Patrick Hand", cursive;
+      font-size: 1.65rem;
+      line-height: 1.1;
+      color: var(--dark-pink);
+      margin: 0 0 10px;
+      overflow-wrap: anywhere;
+    }
+    .msg p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-8deg); }
+      50% { transform: translateY(-15px) rotate(8deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.35; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    @media (max-width: 430px) {
+      .cd-row { gap: 10px; }
+      .cd-tile { width: 70px; padding: 16px 4px 11px; }
+      .cd-num { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <span class="doodle heart" style="top: 40px; left: 2%;">♡</span>
+    <span class="doodle star" style="top: 90px; right: 4%;">✦</span>
+
+    <header class="hero">
+      <h1 id="heroTitle">Julia's birthday<br /><span>is coming!</span></h1>
+      <p class="sub" id="heroSub">October 27 ♡ Write her something she'll keep.</p>
+      <div class="cd-row" id="cdRow" role="timer" aria-label="Countdown to Julia's birthday"></div>
+      <p class="count-note" id="countNote"></p>
+    </header>
+
+    <p class="card center" id="errorCard" hidden></p>
+
+    <!-- before the countdown ends -->
+    <section class="card" id="writeCard" hidden>
+      <h2>Leave a message for Julia ♡</h2>
+      <p class="fine">
+        Julia will read it when the countdown ends. Heads up: after she opens her letters,
+        everyone with this link can read all the messages too.
+      </p>
+      <form id="form" novalidate>
+        <label>Your name
+          <input id="nameInput" maxlength="40" autocomplete="name" placeholder="Who is this from?" />
+        </label>
+        <label>Your message
+          <textarea id="bodyInput" maxlength="1500" placeholder="Write something from the heart..."></textarea>
+        </label>
+        <div class="form-foot">
+          <span id="counter">0 / 1500</span>
+          <button class="primary-btn" id="sendButton" type="submit">Send ♡</button>
+        </div>
+        <p class="note" id="formNote" role="status"></p>
+      </form>
+    </section>
+
+    <!-- countdown over, Julia hasn't opened her letters yet -->
+    <section class="card center" id="waitCard" hidden>
+      <h2>The countdown is over! 🎉</h2>
+      <p>Julia hasn't opened her letters yet. This page updates by itself, so keep it open ♡</p>
+    </section>
+
+    <!-- Julia opened her letters: everyone can read, nobody can interact -->
+    <section id="wall" hidden>
+      <h2 class="wall-title">Julia's letters ♡</h2>
+      <p class="wall-sub" id="wallSub"></p>
+      <div class="cards" id="cards"></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    // Every call costs a little of the free quota and a moment of waiting, so this page asks the server as rarely as possible:
+    // once on load, once when the countdown ends, then (only while visible) every ~30s until Julia opens.
+    const POLL_MS = (window.APP_CONFIG && window.APP_CONFIG.POLL_MS) || 30000;
+
+    let status = null;
+    let stopCountdown = null;
+    let wallLoaded = false;
+    let loadingWall = false;
+    let pollTimer = null;
+    let lastRefresh = 0;
+    let busy = false;
+
+    function showError(text) {
+      $("errorCard").textContent = text;
+      $("errorCard").hidden = false;
+    }
+
+    function stopPolling() {
+      if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    }
+
+    function schedulePoll(ms) {
+      stopPolling();
+      pollTimer = setTimeout(() => {
+        pollTimer = null;
+        if (document.hidden) { schedulePoll(POLL_MS); return; }
+        refresh(false);
+      }, ms + Math.random() * 4000); // jitter so friends don't all call at the same second
+    }
+
+    async function refresh(first) {
+      if (busy) return;
+      busy = true;
+      stopPolling();
+      try {
+        status = await BD.getStatus();
+        lastRefresh = Date.now();
+        $("errorCard").hidden = true;
+      } catch (e) {
+        if (first || !status) {
+          showError(e.message === "not_configured"
+            ? "Setup isn't finished yet: config.js still needs the Supabase URL and key."
+            : "Couldn't connect right now. Please check your internet and refresh the page ♡");
+        } else {
+          schedulePoll(POLL_MS); // temporary hiccup: keep what's on screen, try again later
+        }
+        busy = false;
+        return;
+      }
+      busy = false;
+      render();
+    }
+
+    // A phone that slept has a stale clock offset: re-sync when the tab comes back.
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && !wallLoaded && Date.now() - lastRefresh > 60000) refresh(false);
+    });
+
+    function setMode(mode) {
+      $("writeCard").hidden = mode !== "before";
+      $("waitCard").hidden = mode !== "waiting";
+      $("wall").hidden = mode !== "opened";
+      $("cdRow").hidden = mode === "opened";
+    }
+
+    function render() {
+      if (stopCountdown) { stopCountdown(); stopCountdown = null; }
+      const left = BD.msLeft(status);
+
+      if (left > 0) {
+        setMode("before");
+        $("heroTitle").innerHTML = "Julia's birthday<br /><span>is coming!</span>";
+        $("heroSub").textContent = "October 27 ♡ Write her something she'll keep.";
+        $("countNote").textContent = status.count === 0
+          ? "Be the first to write her something ♡"
+          : status.count + (status.count === 1 ? " message so far ♡" : " messages so far ♡");
+        stopCountdown = BD.startCountdown($("cdRow"), status, () => refresh());
+        return;
+      }
+
+      $("heroTitle").innerHTML = "Happy birthday,<br /><span>Julia!</span>";
+
+      if (!status.opened) {
+        setMode("waiting");
+        $("heroSub").textContent = "The big day is here ♡";
+        $("countNote").textContent = status.count === 1
+          ? "1 friend wrote her a letter ♡"
+          : status.count + " friends wrote her letters ♡";
+        $("cdRow").hidden = true;
+        schedulePoll(POLL_MS); // waiting for Julia to open her letters
+        return;
+      }
+
+      setMode("opened");
+      $("heroSub").textContent = "Julia opened her letters ♡";
+      $("countNote").textContent = "";
+      loadWall();
+    }
+
+    async function loadWall() {
+      if (wallLoaded || loadingWall) return;
+      loadingWall = true;
+      try {
+        const list = await BD.rpc("get_public_messages");
+        const items = Array.isArray(list) ? list : [];
+        const tilts = ["-1.2deg", "0.9deg", "-0.4deg", "1.3deg"];
+        const tapes = ["#f5aaba", "#cfc0ef", "#bfe3d8", "#ffe2a6"];
+        const frag = document.createDocumentFragment();
+        items.forEach((m, i) => {
+          const card = document.createElement("article");
+          card.className = "msg";
+          card.style.setProperty("--tilt", tilts[i % tilts.length]);
+          card.style.setProperty("--tape", tapes[i % tapes.length]);
+          const h = document.createElement("h3");
+          h.textContent = m.name;       // textContent: friends' text can never run as code
+          const p = document.createElement("p");
+          p.textContent = m.body;
+          card.appendChild(h);
+          card.appendChild(p);
+          frag.appendChild(card);
+        });
+        $("cards").replaceChildren(frag);
+        $("wallSub").textContent = items.length === 0
+          ? "No letters were written this time ♡"
+          : "Here's everything everyone wrote for her ♡";
+        wallLoaded = true;
+        stopPolling();
+      } catch (e) {
+        schedulePoll(8000); // try again shortly
+      }
+      loadingWall = false;
+    }
+
+    // ---------- writing a message ----------
+    const bodyInput = $("bodyInput");
+    const formNote = $("formNote");
+
+    function setNote(text, kind) {
+      formNote.textContent = text;
+      formNote.className = "note" + (kind ? " " + kind : "");
+    }
+
+    bodyInput.addEventListener("input", () => {
+      $("counter").textContent = bodyInput.value.length + " / 1500";
+    });
+
+    $("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("nameInput").value.trim();
+      const body = bodyInput.value.trim();
+      if (!name || !body) {
+        setNote("Please add your name and a message ♡", "err");
+        return;
+      }
+      const btn = $("sendButton");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      setNote("");
+      try {
+        await BD.rpc("add_message", { p_name: name, p_body: body }, { retry: false });
+        bodyInput.value = "";
+        $("counter").textContent = "0 / 1500";
+        setNote("Sent! Julia will read it on her birthday ♡ You can write another one if you like.", "ok");
+        if (status) {
+          status.count += 1;
+          render();
+        }
+      } catch (err) {
+        if (err.message === "closed") {
+          setNote("The countdown just ended, so messages are closed now ♡", "err");
+          refresh();
+        } else if (err.message === "full") {
+          setNote("The message box is full, sorry!", "err");
+        } else if (err.message === "invalid") {
+          setNote("Your name needs to be 1-40 characters and your message 1-1500 ♡", "err");
+        } else if (err.message === "busy") {
+          setNote("Lots of people are writing right now. Please press Send again in a moment ♡", "err");
+        } else {
+          setNote("Couldn't confirm it was sent. Your message is still here, please try again in a moment ♡", "err");
+        }
+      }
+      btn.disabled = false;
+      btn.textContent = "Send ♡";
+    });
+
+    // ---------- go ----------
+    refresh(true);
+  </script>
+</body>
+</html>
