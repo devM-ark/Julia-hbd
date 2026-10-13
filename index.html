@@ -228,8 +228,7 @@
     <span class="doodle star" style="top: 90px; right: 4%;">✦</span>
 
     <header class="hero">
-      <h1 id="heroTitle">Julia's birthday<br /><span>is coming!</span></h1>
-      <p class="sub" id="heroSub">October 27 ♡ Write her something she'll keep.</p>
+      <h1 id="heroTitle">Julia's Birthday<br /><span>is coming!</span></h1>
       <div class="cd-row" id="cdRow" role="timer" aria-label="Countdown to Julia's birthday"></div>
       <p class="count-note" id="countNote"></p>
     </header>
@@ -238,21 +237,21 @@
 
     <!-- before the countdown ends -->
     <section class="card" id="writeCard" hidden>
-      <h2>Leave a message for Julia ♡</h2>
+      <h2>Leave a message for Julia!</h2>
       <p class="fine">
-        Julia will read it when the countdown ends. Heads up: after she opens her letters,
+        Julia will read it when the countdown ends. After she opens her letters,
         everyone with this link can read all the messages too.
       </p>
       <form id="form" novalidate>
-        <label>Your name
-          <input id="nameInput" maxlength="40" autocomplete="name" placeholder="Who is this from?" />
+        <label>Sino ka po?
+          <input id="nameInput" maxlength="40" autocomplete="name" placeholder="" />
         </label>
-        <label>Your message
-          <textarea id="bodyInput" maxlength="1500" placeholder="Write something from the heart..."></textarea>
+        <label>Sulat ka message plsss!
+          <textarea id="bodyInput" maxlength="1500" placeholder="Write something! 'Yung nakakaiyak sa sobrang kilig..."></textarea>
         </label>
         <div class="form-foot">
           <span id="counter">0 / 1500</span>
-          <button class="primary-btn" id="sendButton" type="submit">Send ♡</button>
+          <button class="primary-btn" id="sendButton" type="submit">Send</button>
         </div>
         <p class="note" id="formNote" role="status"></p>
       </form>
@@ -347,11 +346,11 @@
 
       if (left > 0) {
         setMode("before");
-        $("heroTitle").innerHTML = "Julia's birthday<br /><span>is coming!</span>";
-        $("heroSub").textContent = "October 27 ♡ Write her something she'll keep.";
+        $("heroTitle").innerHTML = "Julia's Birthday<br /><span>is coming!</span>";
+        $("heroSub").textContent = "Write her something for her special day!.";
         $("countNote").textContent = status.count === 0
-          ? "Be the first to write her something ♡"
-          : status.count + (status.count === 1 ? " message so far ♡" : " messages so far ♡");
+          ? "Be the first to write her something!"
+          : status.count + (status.count === 1 ? " message so far" : " messages so far");
         stopCountdown = BD.startCountdown($("cdRow"), status, () => refresh());
         return;
       }
@@ -360,17 +359,17 @@
 
       if (!status.opened) {
         setMode("waiting");
-        $("heroSub").textContent = "The big day is here ♡";
+        $("heroSub").textContent = "The big day is here!";
         $("countNote").textContent = status.count === 1
-          ? "1 friend wrote her a letter ♡"
-          : status.count + " friends wrote her letters ♡";
+          ? "1 friend wrote her a letter"
+          : status.count + " friends wrote her letters";
         $("cdRow").hidden = true;
         schedulePoll(POLL_MS); // waiting for Julia to open her letters
         return;
       }
 
       setMode("opened");
-      $("heroSub").textContent = "Julia opened her letters ♡";
+      $("heroSub").textContent = "Julia opened her letters";
       $("countNote").textContent = "";
       loadWall();
     }
@@ -399,8 +398,8 @@
         });
         $("cards").replaceChildren(frag);
         $("wallSub").textContent = items.length === 0
-          ? "No letters were written this time ♡"
-          : "Here's everything everyone wrote for her ♡";
+          ? "No letters were written this time"
+          : "Here's everything everyone wrote for her";
         wallLoaded = true;
         stopPolling();
       } catch (e) {
@@ -427,7 +426,7 @@
       const name = $("nameInput").value.trim();
       const body = bodyInput.value.trim();
       if (!name || !body) {
-        setNote("Please add your name and a message ♡", "err");
+        setNote("Please add your name and a message", "err");
         return;
       }
       const btn = $("sendButton");
@@ -438,23 +437,23 @@
         await BD.rpc("add_message", { p_name: name, p_body: body }, { retry: false });
         bodyInput.value = "";
         $("counter").textContent = "0 / 1500";
-        setNote("Sent! Julia will read it on her birthday ♡ You can write another one if you like.", "ok");
+        setNote("Sent! Julia will read it on her birthday! You can write another one if you like.", "ok");
         if (status) {
           status.count += 1;
           render();
         }
       } catch (err) {
         if (err.message === "closed") {
-          setNote("The countdown just ended, so messages are closed now ♡", "err");
+          setNote("The countdown just ended, so messages are closed now.", "err");
           refresh();
         } else if (err.message === "full") {
           setNote("The message box is full, sorry!", "err");
         } else if (err.message === "invalid") {
-          setNote("Your name needs to be 1-40 characters and your message 1-1500 ♡", "err");
+          setNote("Your name needs to be 1-40 characters and your message 1-1500", "err");
         } else if (err.message === "busy") {
-          setNote("Lots of people are writing right now. Please press Send again in a moment ♡", "err");
+          setNote("Lots of people are writing right now. Please press Send again in a moment.", "err");
         } else {
-          setNote("Couldn't confirm it was sent. Your message is still here, please try again in a moment ♡", "err");
+          setNote("Couldn't confirm it was sent. Your message is still here, please try again in a moment.", "err");
         }
       }
       btn.disabled = false;

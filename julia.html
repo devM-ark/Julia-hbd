@@ -778,7 +778,7 @@
     <div class="big-heart">♡</div>
     <div id="bootError" hidden>
       <p id="bootErrorText">Couldn't connect. Please check your internet.</p>
-      <button class="primary-btn" id="retryButton">Try again</button>
+      <button class="primary-btn" id="retryButton">Try Again</button>
     </div>
   </div>
 
@@ -788,7 +788,7 @@
     <span class="doodle star" style="top: 25%; right: 10%;">✦</span>
     <span class="doodle heart" style="bottom: 15%; right: 15%;">♥</span>
 
-    <h1>Almost time,<br />Julia ♡</h1>
+    <h1>Almost time,<br />Juliaaaa!</h1>
     <p>Your birthday surprise opens when the countdown hits zero.</p>
     <div class="cd-row" id="cdRow" role="timer" aria-label="Countdown to your birthday surprise"></div>
   </section>
@@ -824,16 +824,16 @@
           <span class="letter-counter" id="letterCounter"></span>
           <button class="nav-btn" id="nextButton" aria-label="Next letter">›</button>
         </div>
-        <p class="hint" id="stageHint">Tap the heart to open your letters ♡</p>
+        <p class="hint" id="stageHint">Tap the heart to open your letters!</p>
       </div>
 
       <div class="intro-content">
         <h1>Hey, <span>Juliaaaaa!</span></h1>
         <p class="subtitle" id="introText">
-          Everyone who loves you wrote you a letter ♡
+          Everyone who loves you wrote you a letter!
         </p>
         <p class="letter-count" id="letterCount"></p>
-        <button class="primary-btn" id="openButton">Open my letters ♡</button>
+        <button class="primary-btn" id="openButton">Open my Letters</button>
         <p class="note" id="letterNote" role="status"></p>
       </div>
 
@@ -842,7 +842,7 @@
 
     <!-- cake -->
     <section class="section cake-section" id="cake">
-      <span class="section-label">/cake</span>
+      <span class="section-label"></span>
 
       <span class="doodle star" style="top: 18%; left: 12%;">✦</span>
       <span class="doodle heart" style="bottom: 18%; right: 8%;">♡</span>
@@ -937,15 +937,13 @@
           </svg>
         </div>
 
-        <button class="primary-btn" id="wishButton">Make a Wish ✨</button>
+        <button class="primary-btn" id="wishButton">Make a Wish!</button>
       </div>
 
       <div class="cake-message">
         <h2>Make a wish,<br />Julia!</h2>
         <p class="subtitle">
-          Close your eyes, think of something wonderful,
-          and let this new year of your life be filled
-          with beautiful surprises.
+          Close your eyes, think of something wonderful!
         </p>
         <p id="wishResult"></p>
       </div>
@@ -955,7 +953,7 @@
 
     <!-- memories -->
     <section class="section memories" id="memories">
-      <span class="section-label">/memories</span>
+      <span class="section-label"></span>
 
       <div class="memories-heading">
         <h2>Our Memories ♡</h2>
@@ -973,7 +971,7 @@
 
     <!-- message -->
     <section class="section message-section" id="message">
-      <span class="section-label">/message</span>
+      <span class="section-label"></span>
 
       <span class="doodle heart" style="top: 17%; left: 10%;">♡</span>
       <span class="doodle star" style="top: 22%; right: 12%;">✦</span>
@@ -993,7 +991,7 @@ and more beautiful moments ahead.
 Stay amazing. You deserve all the good things. ♡
         </p>
 
-        <p style="margin-top: 35px;">Made with love for Julia ♡</p>
+        <p style="margin-top: 35px;">Made with love for Julia!</p>
       </div>
     </section>
   </div>
@@ -1031,8 +1029,8 @@ Stay amazing. You deserve all the good things. ♡
         status = await BD.getStatus();
       } catch (e) {
         $("bootErrorText").textContent = e.message === "not_configured"
-          ? "Setup isn't finished yet: config.js still needs the Supabase URL and key."
-          : "Couldn't connect. Please check your internet and try again ♡";
+          ? "Setup isn't finished yet!"
+          : "Couldn't connect. Please check your internet and try again";
         $("bootError").hidden = false;
         return;
       }
@@ -1070,8 +1068,8 @@ Stay amazing. You deserve all the good things. ♡
       window.scrollTo(0, 0);
       if (status && status.count > 0) {
         $("letterCount").textContent = status.count === 1
-          ? "1 letter is waiting for you ♡"
-          : status.count + " letters are waiting for you ♡";
+          ? "1 letter is waiting for you"
+          : status.count + " letters are waiting for you";
       }
       if (withConfetti) createConfetti();
     }
@@ -1091,28 +1089,28 @@ Stay amazing. You deserve all the good things. ♡
         const data = await BD.rpc("julia_open", { p_token: token });
         letters = Array.isArray(data) ? data : [];
         if (letters.length === 0) {
-          letters = [{ name: "Everyone", body: "Happy birthday, Julia! ♡" }];
+          letters = [{ name: "Everyone", body: "Happy birthday, Juliaaaaa!" }];
         }
         loaded = true;
         startCarousel();
       } catch (e) {
         loadingLetters = false;
         $("openButton").disabled = false;
-        $("openButton").textContent = "Open my letters ♡";
+        $("openButton").textContent = "Open my letters";
         if (e.message === "forbidden") {
-          $("letterNote").textContent = "This link doesn't look quite right. Please use the exact link that was sent to you ♡";
+          $("letterNote").textContent = "This link doesn't look quite right. Please use the exact link that was sent to you.";
         } else if (e.message === "too_early") {
-          $("letterNote").textContent = "Almost! Give it a moment and try again ♡";
+          $("letterNote").textContent = "Almost! Give it a moment and try again.";
         } else {
-          $("letterNote").textContent = "Couldn't reach your letters. Please check your internet and try again ♡";
+          $("letterNote").textContent = "Couldn't reach your letters. Please check your internet and try again.";
         }
       }
     }
 
     function startCarousel() {
       $("letterNav").hidden = letters.length <= 1;
-      $("stageHint").textContent = "Tap the heart to open each letter ♡ (long letters scroll)";
-      $("introText").textContent = "Take your time. Read every one ♡";
+      $("stageHint").textContent = "Tap the heart to open each letter (long letters scroll)";
+      $("introText").textContent = "Take your time. Read every one.";
       $("openButton").disabled = false;
       $("openButton").textContent = "Are you ready to make a wish?";
       renderLetter(0, true);
