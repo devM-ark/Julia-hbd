@@ -4,7 +4,74 @@
   var cfg = window.APP_CONFIG || {};
   var TIMEOUT_MS = 25000;
 
+  // ---------- PREVIEW MODE (for designing the pages) ----------
+  // Add ?preview=<state> to a page's address and it runs on made-up data: no database calls,
+  // nothing is saved, and no Supabase setup is needed. A "PREVIEW" tag shows in the corner.
+  //   julia.html?preview=gate      Julia's countdown            (add &t=10 to watch it end in 10 seconds)
+  //   julia.html?preview=after     Julia's letters, right away  (add &n=12 for 12 sample letters)
+  //   index.html?preview=before    friends: countdown + write form (add &t=10 to watch it end)
+  //   index.html?preview=waiting   friends: "waiting for Julia"
+  //   index.html?preview=opened    friends: the read-only wall   (add &n=30 for 30 sample messages)
+  // Set ALLOW_PREVIEW: false in config.js right before launch.
+  var params = new URLSearchParams(location.search);
+  var MODES = ["gate", "before", "after", "waiting", "opened"];
+  var previewMode = cfg.ALLOW_PREVIEW === false ? "" : (MODES.indexOf(params.get("preview")) >= 0 ? params.get("preview") : "");
+  var P = null;
+
+  var SAMPLE = [
+    ["Father", "Happy birthday, daughter! Love na love ka ni father. Sana maging genuinely happy ka hindi lang ngayong bday mo kundi araw araw. Labyuu!"],
+    ["James", "Hapi bertday! Libre mo ako ha 😄\nMore years, more laughs, more food."],
+    ["Babi", "Maligayang kaarawan, Julia! Hindi ko makakalimutan yung mga kwentuhan natin tuwing hapon. Lagi kang mag-ingat at huwag magpapagutom. Mahal ka namin! ♡"],
+    ["Bestie", "Happy birthday to my favorite person!!!\n\nEto na yung letter na pinaka-matagal kong isinulat. Thank you sa lahat ng tawanan, sa lahat ng iyakan, sa lahat ng 3am na kwentuhan, at sa lahat ng beses na ikaw ang unang nag-reply kahit kailan ako mag-chat.\n\nSana ngayong taon, lahat ng gusto mo, makuha mo. Lahat ng pagod mo, may kapalit. Lahat ng wish mo, matupad.\n\nNandito lang ako palagi. Love you, Julia! ♡♡♡"],
+    ["Mingyu", "HBD Julia! 🎂"]
+  ];
+  function makeSamples(n) {
+    var out = [];
+    for (var i = 0; i < n; i++) {
+      var s = SAMPLE[i % SAMPLE.length], round = Math.floor(i / SAMPLE.length);
+      out.push({ name: s[0] + (round ? " " + (round + 1) : ""), body: s[1] });
+    }
+    return out;
+  }
+  function serverErr(code) { var e = new Error(code); e.fromServer = true; return e; }
+
+  if (previewMode) {
+    var t = parseFloat(params.get("t"));
+    var future = previewMode === "gate" || previewMode === "before";
+    P = {
+      release: Date.now() + (future ? (t > 0 ? t * 1000 : ((3 * 24 + 4) * 3600 + 25 * 60 + 12) * 1000) : -60000),
+      opened: previewMode === "opened",
+      msgs: makeSamples(Math.max(1, Math.min(60, parseInt(params.get("n"), 10) || 5)))
+    };
+    var tag = document.createElement("div");
+    tag.textContent = "PREVIEW · sample data · nothing is saved";
+    tag.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9999;padding:6px 12px;border-radius:999px;background:#68485b;color:#fff;font:600 11px/1.4 system-ui,sans-serif;letter-spacing:.5px;opacity:.85;pointer-events:none";
+    document.body.appendChild(tag);
+  }
+
+  // Answers the same four calls as the database, from memory, with a short delay like the real thing.
+  async function previewRpc(fn, args) {
+    await sleep(350);
+    var now = Date.now();
+    if (fn === "get_status") return { now: new Date(now).toISOString(), release_at: new Date(P.release).toISOString(), opened: P.opened, count: P.msgs.length };
+    if (fn === "add_message") {
+      if (now >= P.release) throw serverErr("closed");
+      var nm = String((args && args.p_name) || "").trim(), bd = String((args && args.p_body) || "").trim();
+      if (!nm || nm.length > 40 || !bd || bd.length > 1500) throw serverErr("invalid");
+      P.msgs.push({ name: nm, body: bd });
+      return { ok: true };
+    }
+    if (fn === "julia_open") {
+      if (now < P.release) throw serverErr("too_early");
+      P.opened = true;
+      return P.msgs.slice();
+    }
+    if (fn === "get_public_messages") return now < P.release || !P.opened ? [] : P.msgs.slice();
+    throw serverErr("unknown");
+  }
+
   function configured() {
+    if (previewMode) return true;
     var u = String(cfg.SUPABASE_URL || "");
     var k = String(cfg.SUPABASE_KEY || "");
     return /^https?:\/\/\S+$/.test(u) && k.length > 10 && !/YOUR-/i.test(u + k);
@@ -45,6 +112,7 @@
 
   // Reads are retried once. Writes are never retried, so a message can't be saved twice.
   async function rpc(fn, args, opts) {
+    if (previewMode) return previewRpc(fn, args);
     if (!configured()) throw new Error("not_configured");
     var tries = opts && opts.retry === false ? 1 : 2;
     for (var i = 0; i < tries; i++) {
