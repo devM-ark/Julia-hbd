@@ -230,7 +230,7 @@
     <header class="hero">
       <h1 id="heroTitle">Julia's Birthday<br /><span>is coming!</span></h1>
 	  <p class="sub" id="heroSub"></p>
-      <div class="cd-row" id="cdRow" role="timer" aria-label="Countdown to Julia's birthday"></div>
+      <div class="cd-row" id="cdRow" role="timer" aria-label="Countdown to Julia's Birthday"></div>
       <p class="count-note" id="countNote"></p>
     </header>
 
@@ -260,8 +260,8 @@
 
     <!-- countdown over, Julia hasn't opened her letters yet -->
     <section class="card center" id="waitCard" hidden>
-      <h2>The countdown is over! 🎉</h2>
-      <p>Julia hasn't opened her letters yet. This page updates by itself, so keep it open.</p>
+      <h2>BIRTHDAYYYY NA NI JULIAAAAA!</h2>
+      <p>Di pa nya nababasa mga letters nyo. Pwede nyo na din basahin pag nabasa na ni bday gurl!</p>
     </section>
 
     <!-- Julia opened her letters: everyone can read, nobody can interact -->
@@ -438,7 +438,7 @@
         await BD.rpc("add_message", { p_name: name, p_body: body }, { retry: false });
         bodyInput.value = "";
         $("counter").textContent = "0 / 1500";
-        setNote("Sent! Julia will read it on her birthday! Secret muna natin 'to for now.", "ok");
+        setNote("Sent! Julia will read it on her birthday! Salamat!", "ok");
         if (status) {
           status.count += 1;
           render();

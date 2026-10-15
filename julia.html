@@ -47,6 +47,7 @@
 
     .section {
       min-height: 100vh;
+      min-height: 100svh;
       position: relative;
       padding: 90px 7%;
       display: flex;
@@ -292,7 +293,13 @@
       background: var(--env-b);
       clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
       z-index: 2; /* the front pocket sits IN FRONT of the paper, so the letter looks tucked inside */
+      will-change: transform; /* own layer: a scrolling (long) letter must never paint over the pocket */
       border-radius: 8px;
+    }
+
+    .envelope-from,
+    .envelope-seal {
+      will-change: transform;
     }
 
     .envelope-flap {
@@ -346,10 +353,10 @@
     .letter {
       position: absolute;
       width: 85%;
-      height: 320px;
+      height: 240px;
       left: 7.5%;
       bottom: 20px;
-      padding: 22px 22px 60px;
+      padding: 22px 22px 30px;
       text-align: center;
       background: var(--paper);
       border-radius: 5px;
@@ -385,7 +392,7 @@
     }
 
     .envelope-wrap.open .letter {
-      transform: translateY(-75px); /* bottom corners stay hidden behind the pocket's V edges */
+      transform: translateY(-154px); /* the paper ends INSIDE the envelope; its bottom corners hide behind the pocket's V edges */
       opacity: 1;
       z-index: 1;
       pointer-events: auto; /* an open letter can be scrolled */
@@ -482,6 +489,33 @@
       line-height: 1;
     }
 
+    /* night-time cake section: the pale cake pops against a deeper background */
+    .cake-section {
+      background:
+        radial-gradient(circle at 50% 40%, #7d5c9c 0%, #54396f 55%, #3a2a52 100%);
+      color: #f8e9f2;
+    }
+
+    .cake-section .cake-message h2 { color: #ffd6e4; }
+    .cake-section .next-arrow { color: #ffd6e4; }
+    .cake-section .doodle.heart { color: #f6a6b8; }
+    .cake-section .primary-btn {
+      background: #f6a6b8;
+      color: #4a2443;
+      box-shadow: 0 8px 0 rgba(20, 8, 32, 0.35);
+    }
+
+    .candle { cursor: pointer; }
+
+    /* your picture is the cursor while there are candles left to blow */
+    .cake.blowing,
+    .cake.blowing .candle,
+    .cake.blowing .flame {
+      cursor: url("assets/pictures/blow.png") 21 60, pointer;
+    }
+
+    .candle.blown .glow { display: none; }
+
     /* memories */
     .memories {
       background:
@@ -489,22 +523,25 @@
         linear-gradient(rgba(238, 213, 185, 0.22) 1px, transparent 1px),
         #f8efdf;
       background-size: 25px 25px;
-      display: block;
-      padding-top: 110px;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 40px;
+      padding-bottom: 60px;
     }
 
     .memories-heading {
       text-align: center;
-      margin-bottom: 45px;
+      margin-bottom: 30px;
     }
 
     .memories-heading h2 {
       display: inline-block;
+      margin: 0;
       background: #d7b6ec;
       padding: 10px 35px;
       transform: rotate(-2deg);
       font-family: "Patrick Hand", cursive;
-      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-size: clamp(2.4rem, min(6vw, 9vh), 5rem);
       color: #73547b;
       box-shadow: 8px 8px 0 rgba(137, 95, 145, 0.12);
     }
@@ -536,6 +573,11 @@
       align-items: center;
       width: max-content;
       animation: filmScroll 46s linear infinite;
+      animation-play-state: paused; /* starts when the reel is on screen */
+    }
+
+    .filmstrip.run .film-track {
+      animation-play-state: running;
     }
 
     .filmstrip:hover .film-track,
@@ -569,7 +611,7 @@
 
     .film-frame {
       flex: 0 0 auto;
-      width: 185px;
+      width: clamp(210px, min(26vw, 40vh), 340px);
       margin: 0 7px;
       padding: 6px;
       background: #14121a;
@@ -732,12 +774,6 @@
       to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
     }
 
-    @media (max-width: 1050px) {
-      .film-frame {
-        width: 160px;
-      }
-    }
-
     @media (max-width: 760px) {
       .section {
         padding: 90px 7% 80px;
@@ -745,12 +781,30 @@
         gap: 45px;
       }
 
-      .intro-content {
+      /* Julia's greeting sits ABOVE the envelope so she reads it first */
+      .intro {
+        gap: 16px;
         text-align: center;
       }
 
+      .intro-content {
+        display: contents;
+      }
+
       .intro-content h1 {
-        font-size: 4.5rem;
+        order: -3;
+        font-size: 3.4rem;
+        margin: 0;
+      }
+
+      #introText {
+        order: -2;
+        margin: 0 auto;
+      }
+
+      .stage {
+        order: -1;
+        padding-top: 115px;
       }
 
       .envelope-wrap {
@@ -762,16 +816,21 @@
       }
 
       .cake {
-        transform: scale(0.82);
-        margin-top: -25px;
-        margin-bottom: -25px;
+        width: min(94vw, 460px);
+        margin: 0 auto 10px;
       }
 
       .film-frame {
-        width: 140px;
+        width: min(74vw, 38vh);
+      }
+
+      .memories-heading h2 {
+        padding: 8px 22px;
+        font-size: 2.4rem;
       }
 
       .memories {
+        gap: 0;
         padding-left: 5%;
         padding-right: 5%;
       }
@@ -792,10 +851,6 @@
     }
 
     @media (max-width: 430px) {
-      .film-frame {
-        width: 125px;
-      }
-
       .cd-row {
         gap: 10px;
       }
@@ -818,7 +873,7 @@
     <div class="big-heart">♡</div>
     <div id="bootError" hidden>
       <p id="bootErrorText">Couldn't connect. Please check your internet.</p>
-      <button class="primary-btn" id="retryButton">Try Again</button>
+      <button class="primary-btn" id="retryButton">Try Again!</button>
     </div>
   </div>
 
@@ -854,7 +909,7 @@
           </div>
           <div class="envelope" id="envelope" tabindex="0" role="button" aria-label="Open or close the letter">
             <div class="envelope-flap"></div>
-            <span class="envelope-from" id="envelopeFrom">for Julia ♡</span>
+            <span class="envelope-from" id="envelopeFrom">for Julia</span>
             <div class="envelope-seal">♡</div>
           </div>
         </div>
@@ -880,7 +935,7 @@
       <a class="next-arrow" id="introArrow" href="#cake" hidden>⌄</a>
     </section>
 
-    <!-- Everything below stays hidden until Julia has opened every letter -->
+    <!-- Everything below is unlocked step by step: letters -> candles -> memories -->
     <div id="afterLetters" hidden>
 
     <!-- cake -->
@@ -888,11 +943,13 @@
       <span class="section-label"></span>
 
       <span class="doodle star" style="top: 18%; left: 12%;">✦</span>
+      <span class="doodle star" style="top: 10%; right: 18%; animation-delay: .8s;">✦</span>
+      <span class="doodle star" style="bottom: 24%; left: 6%; animation-delay: 1.3s;">✦</span>
       <span class="doodle heart" style="bottom: 18%; right: 8%;">♡</span>
 
       <div class="cake-area">
-        <div class="cake" id="cakeGraphic">
-          <svg viewBox="0 30 400 326" class="cake-svg" role="img" aria-label="Birthday cake with three candles">
+        <div class="cake blowing" id="cakeGraphic">
+          <svg viewBox="0 36 400 320" class="cake-svg" role="img" aria-label="Birthday cake with three candles">
             <defs>
               <linearGradient id="tierBottom" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0" stop-color="#fbc4d4"/>
@@ -904,6 +961,7 @@
                 <stop offset="0.55" stop-color="#ffdce6"/>
                 <stop offset="1" stop-color="#f7c3d3"/>
               </linearGradient>
+              <radialGradient id="glowG"><stop offset="0" stop-color="#ffd36e" stop-opacity="0.55"/><stop offset="1" stop-color="#ffd36e" stop-opacity="0"/></radialGradient>
               <linearGradient id="candleStripeA" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0" stop-color="#d7c1f0"/>
                 <stop offset="1" stop-color="#c5a8ea"/>
@@ -914,96 +972,102 @@
             <ellipse cx="200" cy="338" rx="148" ry="10" fill="#d8b6c3" opacity="0.35"/>
             <ellipse cx="200" cy="330" rx="150" ry="17" fill="#ffffff" stroke="#e5cbd4" stroke-width="4"/>
             <ellipse cx="200" cy="326" rx="150" ry="13" fill="#fffdfb"/>
-            <!-- soft contact shadow: the cake sits ON the plate -->
+            <!-- contact shadow: the cake sits ON the plate -->
             <ellipse cx="200" cy="326" rx="112" ry="12" fill="#d8b6c3" opacity="0.5"/>
 
-            <!-- bottom tier -->
-            <path d="M95,211 Q95,195 111,195 L289,195 Q305,195 305,211 L305,318 A105,10 0 0 1 95,318 Z" fill="url(#tierBottom)" stroke="#e28ba3" stroke-width="3"/>
-
-            <!-- bottom tier sprinkles -->
+            <!-- bottom tier: body, icing top, drips -->
+            <path d="M95,204 L95,318 A105,10 0 0 0 305,318 L305,204 Z" fill="url(#tierBottom)" stroke="#e28ba3" stroke-width="3"/>
             <g>
-              <rect x="163.5" y="219.8" width="6.0" height="3.0" rx="1.5" fill="#ffffff" transform="rotate(274 166.5 221.3)"/>
-              <rect x="119.9" y="252.2" width="6.0" height="3.0" rx="1.5" fill="#bfe3d8" transform="rotate(19 122.9 253.7)"/>
-              <rect x="118.3" y="239.9" width="6.0" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(282 121.3 241.4)"/>
-              <rect x="182.7" y="270.5" width="6.0" height="3.0" rx="1.5" fill="#ffffff" transform="rotate(322 185.7 272.0)"/>
-              <rect x="220.2" y="279.1" width="8.0" height="4.0" rx="2.0" fill="#bfe3d8" transform="rotate(25 224.2 281.1)"/>
-              <rect x="253.0" y="219.8" width="7.0" height="3.5" rx="1.8" fill="#f6d36f" transform="rotate(214 256.5 221.5)"/>
-              <rect x="129.4" y="217.3" width="6.0" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(52 132.4 218.8)"/>
-              <rect x="212.5" y="256.4" width="6.0" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(280 215.5 257.9)"/>
-              <rect x="237.3" y="250.8" width="6.0" height="3.0" rx="1.5" fill="#bfe3d8" transform="rotate(254 240.3 252.3)"/>
-              <rect x="230.3" y="240.1" width="8.0" height="4.0" rx="2.0" fill="#c8a4ed" transform="rotate(299 234.3 242.1)"/>
-              <rect x="180.4" y="264.8" width="8.0" height="4.0" rx="2.0" fill="#f6d36f" transform="rotate(215 184.4 266.8)"/>
-              <rect x="139.9" y="258.4" width="7.0" height="3.5" rx="1.8" fill="#bfe3d8" transform="rotate(174 143.4 260.1)"/>
-              <rect x="233.1" y="252.6" width="8.0" height="4.0" rx="2.0" fill="#bfe3d8" transform="rotate(35 237.1 254.6)"/>
-              <rect x="238.2" y="275.0" width="6.0" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(236 241.2 276.5)"/>
-              <rect x="169.5" y="254.3" width="6.0" height="3.0" rx="1.5" fill="#e98ba8" transform="rotate(111 172.5 255.8)"/>
+              <rect x="187.8" y="281.7" width="7" height="3.5" rx="1.8" fill="#c8a4ed" transform="rotate(260 191.3 283.5)"/>
+              <rect x="257.1" y="264.7" width="8" height="4.0" rx="2.0" fill="#c8a4ed" transform="rotate(322 261.1 266.7)"/>
+              <rect x="215.6" y="264.6" width="7" height="3.5" rx="1.8" fill="#f6d36f" transform="rotate(72 219.1 266.3)"/>
+              <rect x="125.6" y="293.2" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(304 129.6 295.2)"/>
+              <rect x="278.9" y="300.4" width="8" height="4.0" rx="2.0" fill="#e98ba8" transform="rotate(332 282.9 302.4)"/>
+              <rect x="137.1" y="256.7" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(30 141.1 258.7)"/>
+              <rect x="116.1" y="296.5" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(237 120.1 298.5)"/>
+              <rect x="166.1" y="283.2" width="6" height="3.0" rx="1.5" fill="#e98ba8" transform="rotate(119 169.1 284.7)"/>
+              <rect x="220.1" y="279.0" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(234 224.1 281.0)"/>
+              <rect x="222.6" y="274.7" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(130 226.6 276.7)"/>
+              <rect x="164.2" y="266.6" width="7" height="3.5" rx="1.8" fill="#ffffff" transform="rotate(35 167.7 268.3)"/>
+              <rect x="206.9" y="261.0" width="6" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(197 209.9 262.5)"/>
+              <rect x="121.5" y="256.8" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(109 125.5 258.8)"/>
+              <rect x="146.1" y="297.9" width="7" height="3.5" rx="1.8" fill="#c8a4ed" transform="rotate(203 149.6 299.6)"/>
+              <rect x="182.2" y="282.0" width="6" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(172 185.2 283.5)"/>
+              <rect x="125.0" y="271.3" width="7" height="3.5" rx="1.8" fill="#ffffff" transform="rotate(68 128.5 273.0)"/>
             </g>
+            <ellipse cx="200" cy="204" rx="108" ry="15" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
+            <path d="M92.0,204.0 A108.0,15.0 0 0 0 308.0,204.0 L308.0,218.0 Q294.5,259.6 281.0,227.9 Q267.5,262.0 254.0,231.0 Q240.5,264.1 227.0,232.5 Q213.5,265.0 200.0,233.0 Q186.5,265.0 173.0,232.5 Q159.5,264.1 146.0,231.0 Q132.5,262.0 119.0,227.9 Q105.5,259.6 92.0,218.0 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
 
-            <!-- top tier -->
-            <rect x="140" y="140" width="120" height="68" rx="14" fill="url(#tierTop)" stroke="#e28ba3" stroke-width="3"/>
+            <!-- the top tier's shadow on the icing below -->
+            <ellipse cx="200" cy="206" rx="72" ry="12" fill="#e2c3cf" opacity="0.75"/>
 
-            <!-- top tier sprinkles -->
+            <!-- top tier: body, icing top, drips -->
+            <path d="M140,138 L140,204 A60,9 0 0 0 260,204 L260,138 Z" fill="url(#tierTop)" stroke="#e28ba3" stroke-width="3"/>
             <g>
-              <rect x="201.9" y="164.9" width="7.0" height="3.5" rx="1.8" fill="#e98ba8" transform="rotate(212 205.4 166.7)"/>
-              <rect x="151.1" y="178.1" width="6.0" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(248 154.1 179.6)"/>
-              <rect x="233.4" y="179.2" width="6.0" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(74 236.4 180.7)"/>
-              <rect x="176.6" y="177.9" width="7.0" height="3.5" rx="1.8" fill="#bfe3d8" transform="rotate(64 180.1 179.7)"/>
-              <rect x="214.9" y="181.3" width="6.0" height="3.0" rx="1.5" fill="#e98ba8" transform="rotate(97 217.9 182.8)"/>
+              <rect x="173.7" y="183.6" width="6" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(249 176.7 185.1)"/>
+              <rect x="167.1" y="190.9" width="7" height="3.5" rx="1.8" fill="#e98ba8" transform="rotate(97 170.6 192.7)"/>
+              <rect x="244.6" y="194.3" width="7" height="3.5" rx="1.8" fill="#c8a4ed" transform="rotate(59 248.1 196.1)"/>
+              <rect x="187.9" y="197.8" width="6" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(303 190.9 199.3)"/>
+              <rect x="179.2" y="196.2" width="6" height="3.0" rx="1.5" fill="#bfe3d8" transform="rotate(201 182.2 197.7)"/>
+              <rect x="245.6" y="191.6" width="8" height="4.0" rx="2.0" fill="#ffffff" transform="rotate(21 249.6 193.6)"/>
+              <rect x="245.0" y="185.4" width="7" height="3.5" rx="1.8" fill="#ffffff" transform="rotate(312 248.5 187.2)"/>
             </g>
+            <ellipse cx="200" cy="138" rx="63" ry="11" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
+            <path d="M137.0,138.0 A63.0,11.0 0 0 0 263.0,138.0 L263.0,150.0 Q250.4,186.8 237.8,158.8 Q225.2,188.4 212.6,160.8 Q200.0,189.2 187.4,160.8 Q174.8,188.4 162.2,158.8 Q149.6,186.8 137.0,150.0 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
 
-            <!-- icing drips: bottom tier, draped over the seam -->
-            <path d="M80,190 L320,190 L320,214 Q305,238 290,214 Q275,238 260,214 Q245,238 230,214 Q215,238 200,214 Q185,238 170,214 Q155,238 140,214 Q125,238 110,214 Q95,238 80,214 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
-
-            <!-- icing drips: top tier -->
-            <path d="M128,126 L272,126 L272,148 Q257.6,170 243.2,148 Q228.8,170 214.4,148 Q200,170 185.6,148 Q171.2,170 156.8,148 Q142.4,170 128,148 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
-
-            <!-- candles (pushed into the icing) -->
-            <g transform="translate(0,8)">
+            <!-- candles, standing in the icing on top -->
             <g class="candle">
-              <rect x="164" y="72" width="14" height="56" rx="4" fill="url(#candleStripeA)"/>
-              <rect x="164" y="80" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="164" y="100" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="164" y="120" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <path class="flame" d="M171,44 C178,54 178,64 171,70 C164,64 164,54 171,44 Z" fill="#ffd36e"/>
-            </g>
-            <g class="candle">
-              <rect x="193" y="66" width="14" height="62" rx="4" fill="url(#candleStripeA)"/>
-              <rect x="193" y="75" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="193" y="95" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="193" y="115" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <path class="flame" d="M200,36 C207,46 207,56 200,62 C193,56 193,46 200,36 Z" fill="#ffd36e"/>
+              <ellipse cx="180" cy="142" rx="11" ry="3" fill="#4a2443" opacity="0.22"/>
+              <ellipse cx="171" cy="141" rx="10" ry="3.4" fill="#ecd3dd"/>
+              <circle class="glow" cx="171" cy="71" r="22" fill="url(#glowG)"/>
+              <rect x="164" y="85" width="14" height="56" rx="4" fill="url(#candleStripeA)"/>
+              <rect x="164" y="93" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="164" y="113" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="164" y="133" width="14" height="7" fill="#fff" opacity="0.85"/>
+              <path class="flame" d="M171,57 C178,67 178,77 171,83 C164,77 164,67 171,57 Z" fill="#ffd36e"/>
+              <rect x="155" y="53" width="32" height="88" fill="transparent"/>
             </g>
             <g class="candle">
-              <rect x="222" y="72" width="14" height="56" rx="4" fill="url(#candleStripeA)"/>
-              <rect x="222" y="80" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="222" y="100" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <rect x="222" y="120" width="14" height="7" fill="#fff" opacity="0.85"/>
-              <path class="flame" d="M229,44 C236,54 236,64 229,70 C222,64 222,54 229,44 Z" fill="#ffd36e"/>
+              <ellipse cx="209" cy="138" rx="11" ry="3" fill="#4a2443" opacity="0.22"/>
+              <ellipse cx="200" cy="137" rx="10" ry="3.4" fill="#ecd3dd"/>
+              <circle class="glow" cx="200" cy="61" r="22" fill="url(#glowG)"/>
+              <rect x="193" y="75" width="14" height="62" rx="4" fill="url(#candleStripeA)"/>
+              <rect x="193" y="83" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="193" y="103" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="193" y="125" width="14" height="7" fill="#fff" opacity="0.85"/>
+              <path class="flame" d="M200,47 C207,57 207,67 200,73 C193,67 193,57 200,47 Z" fill="#ffd36e"/>
+              <rect x="184" y="43" width="32" height="94" fill="transparent"/>
             </g>
+            <g class="candle">
+              <ellipse cx="238" cy="142" rx="11" ry="3" fill="#4a2443" opacity="0.22"/>
+              <ellipse cx="229" cy="141" rx="10" ry="3.4" fill="#ecd3dd"/>
+              <circle class="glow" cx="229" cy="71" r="22" fill="url(#glowG)"/>
+              <rect x="222" y="85" width="14" height="56" rx="4" fill="url(#candleStripeA)"/>
+              <rect x="222" y="93" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="222" y="113" width="14" height="7" fill="#fff" opacity="0.85"/><rect x="222" y="133" width="14" height="7" fill="#fff" opacity="0.85"/>
+              <path class="flame" d="M229,57 C236,67 236,77 229,83 C222,77 222,67 229,57 Z" fill="#ffd36e"/>
+              <rect x="213" y="53" width="32" height="88" fill="transparent"/>
             </g>
           </svg>
         </div>
 
-        <button class="primary-btn" id="wishButton">Make a Wish!</button>
+        <button class="primary-btn" id="wishButton" hidden>Make a Wish!</button>
       </div>
 
       <div class="cake-message">
         <h2>Make a wish,<br />Julia!</h2>
         <p class="subtitle">
-          Close your eyes, think of something wonderful!
+          Close your eyes, make a wish, and blow the candle!
         </p>
         <p id="wishResult"></p>
       </div>
 
-      <a class="next-arrow" href="#memories">⌄</a>
+      <a class="next-arrow" id="cakeArrow" href="#memories" hidden>⌄</a>
     </section>
+
+    <div id="afterCake" hidden>
 
     <!-- memories -->
     <section class="section memories" id="memories">
       <span class="section-label"></span>
 
       <div class="memories-heading">
-        <h2>Our Memories ♡</h2>
+        <h2>Seessh Memories!</h2>
       </div>
 
       <div class="filmstrip-wrap">
@@ -1011,10 +1075,13 @@
           <div class="film-track" id="filmTrack"></div>
         </div>
       </div>
-      <p class="film-hint">Hover the reel to pause ♡</p>
+      <p class="film-hint" id="filmHint">Hover the reel to pause.</p>
+      <p class="film-hint" id="reelNote">Watch every memory to continue.</p>
 
-      <a class="next-arrow" href="#message">⌄</a>
+      <a class="next-arrow" id="memArrow" href="#message" hidden>⌄</a>
     </section>
+
+    <div id="afterMemories" hidden>
 
     <!-- message -->
     <section class="section message-section" id="message">
@@ -1025,22 +1092,22 @@
       <span class="doodle heart" style="bottom: 15%; right: 15%;">♥</span>
 
       <div class="message-paper">
-        <h2>Happy Birthday, Julia! ♡</h2>
+        <h2>Happy Birthday, mah doter Julia!</h2>
         <p id="finalMessage">
-Thank you for being such a wonderful friend.
+Thank you for being such a wonderful person. Please continue being who you are and dont let the others change your good heart.
 
-I hope your special day is filled with happiness,
-laughter, good food, and people who make you smile.
+Too bad hindi ko na kayo nakikita tuwing break time and lunch time. But you can still run to me whenever you need me, your father imnida.
+Sana lamangan to ng mga taong gustong maging parte ng buhay mo. HAHAHAHHAHAHA
 
-Here's to more adventures, more memories,
-and more beautiful moments ahead.
-
-Stay amazing. You deserve all the good things. ♡
+Stay amazing. Hope for your genuine happiness in lyf! LABYUUU!
         </p>
 
-        <p style="margin-top: 35px;">Made with love for Julia!</p>
+        <p style="margin-top: 35px;">- father mark</p>
       </div>
     </section>
+
+    </div><!-- /afterMemories -->
+    </div><!-- /afterCake -->
     </div><!-- /afterLetters -->
   </div>
 
@@ -1126,7 +1193,8 @@ Stay amazing. You deserve all the good things. ♡
           : status.count + " letters are waiting for you";
       }
       if (withConfetti) createConfetti();
-      if (unlockAll) unlockRest();
+      if (unlockAll) { unlockRest(); unlockCake(); unlockMemories(); }
+      if (APP.MUSIC) bgMusic.preload = "auto";
       startMusic();
     }
 
@@ -1165,7 +1233,7 @@ Stay amazing. You deserve all the good things. ♡
 
     function startCarousel() {
       $("letterNav").hidden = letters.length <= 1;
-      $("stageHint").textContent = "Tap the heart to open each letter.";
+      $("stageHint").textContent = "Tap the heart to open each letter (long letters scroll)";
       $("introText").textContent = "Take your time. Read every one.";
       $("openButton").disabled = false;
       $("openButton").textContent = "Are you ready to make a wish?";
@@ -1247,25 +1315,27 @@ Stay amazing. You deserve all the good things. ♡
     });
 
     // ---------- cake ----------
+    // Blow out all the candles to continue.
     const wishButton = $("wishButton");
     const wishResult = $("wishResult");
-    const flames = document.querySelectorAll(".flame");
+    const candles = document.querySelectorAll(".candle");
 
     let blownCount = 0;
 
-    flames.forEach((flame) => {
-      flame.addEventListener("click", () => {
-        const candle = flame.parentElement;
-
+    candles.forEach((candle) => {
+      candle.addEventListener("click", () => {
         if (candle.classList.contains("blown")) return;
 
         candle.classList.add("blown");
         blownCount++;
 
-        if (blownCount === 3) {
+        if (blownCount === candles.length) {
           wishResult.textContent = "Sana matupad lahat ng wish mo!";
           wishButton.textContent = "naol nag wish";
+          wishButton.hidden = false;
+          $("cakeGraphic").classList.remove("blowing");
           createConfetti();
+          unlockCake();
         }
       });
     });
@@ -1273,6 +1343,11 @@ Stay amazing. You deserve all the good things. ♡
     wishButton.addEventListener("click", () => {
       createConfetti();
     });
+
+    function unlockCake() {
+      $("afterCake").hidden = false;
+      $("cakeArrow").hidden = false;
+    }
 
     // ---------- music ----------
     const bgMusic = $("bgMusic");
@@ -1304,28 +1379,30 @@ Stay amazing. You deserve all the good things. ♡
       GESTURES.forEach((t) => window.removeEventListener(t, onGesture, { capture: true }));
     }
 
-    async function startMusic() {
-      if (!APP.MUSIC || !musicWanted || !bgMusic.paused || musicStarting) return;
-      musicStarting = true;
-      try {
-        await bgMusic.play();
+    function startMusic() {
+      if (!APP.MUSIC || !musicWanted || !bgMusic.paused) return;
+      let promise;
+      try { promise = bgMusic.play(); } catch (e) { return; }
+      if (!promise || !promise.then) { disarmGestures(); setMusicUi(true); return; }
+      promise.then(() => {
         disarmGestures();
         setMusicUi(true);
-      } catch (e) {
-        if (e && (e.name === "NotAllowedError" || e.name === "AbortError")) {
-          setMusicUi(false);
-          armGestures(); // try again on her next tap
-        } else {
-          disarmGestures(); // missing or unsupported file
-          musicButton.hidden = true;
+      }).catch((e) => {
+        // not allowed yet (needs a tap) or still loading: stay ready and try again on the next tap
+        setMusicUi(false);
+        armGestures();
+        if (e && e.name !== "NotAllowedError" && e.name !== "AbortError") {
+          console.warn("Music could not play:", e.name, APP.MUSIC);
         }
-      } finally {
-        musicStarting = false;
-      }
+      });
     }
 
     if (APP.MUSIC) {
       bgMusic.src = APP.MUSIC;
+      bgMusic.addEventListener("error", () => {
+        console.warn("Music file could not be loaded:", APP.MUSIC);
+        musicButton.title = "Music file not found";
+      });
       musicButton.hidden = false;
       setMusicUi(false);
     }
@@ -1385,6 +1462,38 @@ Stay amazing. You deserve all the good things. ♡
 
     // the sequence is built twice back-to-back so the scroll loops seamlessly
     filmTrack.replaceChildren(...buildFrames(), ...buildFrames());
+
+    // ---------- memories lock: the message unlocks once every picture has been shown ----------
+    const filmstrip = $("filmstrip");
+    const frameCount = filmTrack.children.length / 2; // one full set of pictures
+    let reelTimer = null;
+    let memoriesDone = false;
+
+    $("filmHint").textContent = window.matchMedia("(hover: hover)").matches
+      ? "Hover the reel to pause."
+      : "Tap the reel to pause.";
+
+    function unlockMemories() {
+      if (memoriesDone) return;
+      memoriesDone = true;
+      clearInterval(reelTimer);
+      $("afterMemories").hidden = false;
+      $("memArrow").hidden = false;
+      $("reelNote").hidden = true;
+    }
+
+    function checkReel() {
+      const last = filmTrack.children[frameCount - 1].getBoundingClientRect();
+      const box = filmstrip.getBoundingClientRect();
+      // the last picture of the first set is fully on screen = everything has been shown
+      if (last.width > 0 && last.right <= box.right - 4 && last.left >= box.left) unlockMemories();
+    }
+
+    new IntersectionObserver((entries) => {
+      if (!entries.some((en) => en.isIntersecting)) return;
+      filmstrip.classList.add("run");
+      if (!memoriesDone && !reelTimer) reelTimer = setInterval(checkReel, 300);
+    }, { threshold: 0.5 }).observe($("memories"));
 
     // ---------- confetti ----------
     function createConfetti() {

@@ -19,11 +19,11 @@
   var P = null;
 
   var SAMPLE = [
-    ["Ana", "Happy birthday, Julia! Thank you for always being there. Sana masaya ang araw mo ♡"],
-    ["Mark", "Hapi bertday! Libre mo ako ha 😄\nMore years, more laughs, more food."],
-    ["Tita Lyn", "Maligayang kaarawan, Julia! Hindi ko makakalimutan yung mga kwentuhan natin tuwing hapon. Lagi kang mag-ingat at huwag magpapagutom. Mahal ka namin! ♡"],
-    ["Bestie", "Happy birthday to my favorite person!!!\n\nEto na yung letter na pinaka-matagal kong isinulat. Thank you sa lahat ng tawanan, sa lahat ng iyakan, sa lahat ng 3am na kwentuhan, at sa lahat ng beses na ikaw ang unang nag-reply kahit kailan ako mag-chat.\n\nSana ngayong taon, lahat ng gusto mo, makuha mo. Lahat ng pagod mo, may kapalit. Lahat ng wish mo, matupad.\n\nNandito lang ako palagi. Love you, Julia! ♡♡♡"],
-    ["Kuya Ben", "HBD Julia! 🎂"]
+    ["Mommy bestie", "Happy birthday, Julia! Thank you for always being there. Sana masaya ang araw mo ♡"],
+    ["Mark", "Hapi bertday! Libre mo ako ha \nMore years, more laughs, more food."],
+    ["Babi", "Maligayang kaarawan, Julia! Hindi ko makakalimutan yung mga kwentuhan natin tuwing hapon. Lagi kang mag-ingat at huwag magpapagutom. Mahal ka namin! ♡"],
+    ["James", "Happy birthday to my favorite person!!!\n\nEto na yung letter na pinaka-matagal kong isinulat. Thank you sa lahat ng tawanan, sa lahat ng iyakan, sa lahat ng 3am na kwentuhan, at sa lahat ng beses na ikaw ang unang nag-reply kahit kailan ako mag-chat.\n\nSana ngayong taon, lahat ng gusto mo, makuha mo. Lahat ng pagod mo, may kapalit. Lahat ng wish mo, matupad.\n\nNandito lang ako palagi. Love you, Julia! ♡♡♡"],
+    ["LA", "HBD Julia! 🎂"]
   ];
   function makeSamples(n) {
     var out = [];
