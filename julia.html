@@ -37,9 +37,19 @@
       font-family: "Comfortaa", sans-serif;
       overflow-x: hidden;
     }
-
-    a, button, svg, .candle, .flame, .envelope, .envelope-seal {
-      -webkit-tap-highlight-color: transparent;
+	
+	* {
+	  -webkit-tap-highlight-color: transparent;
+	}
+	
+	.cake, .cake * {
+	  -webkit-user-select: none;
+	  user-select: none;
+	  -webkit-touch-callout: none;
+	  outline: none;
+	}
+	
+	a, button, svg, .candle, .flame, .envelope, .envelope-seal {
       touch-action: manipulation;
     }
 
