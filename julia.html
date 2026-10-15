@@ -214,6 +214,8 @@
         radial-gradient(circle at 92% 78%, #e4daf8 0 13%, transparent 13.5%),
         var(--cream);
       gap: 70px;
+      padding-top: 50px;
+      padding-bottom: 60px;
     }
 
     .intro-content {
@@ -248,6 +250,7 @@
 
     /* envelope stage: one envelope per person */
     .stage {
+      padding-top: 150px; /* room for the letter that rises out of the envelope */
       z-index: 2;
       display: flex;
       flex-direction: column;
@@ -288,6 +291,7 @@
       inset: 0;
       background: var(--env-b);
       clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+      z-index: 2; /* the front pocket sits IN FRONT of the paper, so the letter looks tucked inside */
       border-radius: 8px;
     }
 
@@ -318,6 +322,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       pointer-events: none;
+      transition: opacity 0.3s;
     }
 
     .envelope-seal {
@@ -341,15 +346,15 @@
     .letter {
       position: absolute;
       width: 85%;
-      height: 230px;
+      height: 320px;
       left: 7.5%;
       bottom: 20px;
-      padding: 22px 22px 16px;
+      padding: 22px 22px 60px;
       text-align: center;
       background: var(--paper);
       border-radius: 5px;
       transition: transform 0.8s, opacity 0.4s;
-      transform: translateY(190px);
+      transform: translateY(20px);
       opacity: 0;
       z-index: 1;
       box-shadow: var(--shadow);
@@ -380,13 +385,17 @@
     }
 
     .envelope-wrap.open .letter {
-      transform: translateY(-150px);
+      transform: translateY(-75px); /* bottom corners stay hidden behind the pocket's V edges */
       opacity: 1;
-      z-index: 4;
+      z-index: 1;
       pointer-events: auto; /* an open letter can be scrolled */
     }
 
     .envelope-wrap.open .envelope-seal {
+      opacity: 0;
+    }
+
+    .envelope-wrap.open .envelope-from {
       opacity: 0;
     }
 
@@ -428,6 +437,12 @@
     }
 
 /* cake */
+.cake-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .cake {
   width: 360px;
   max-width: 100%;
@@ -645,10 +660,27 @@
       z-index: 20;
       background: #f7c5d2;
       color: var(--dark-pink);
-      padding: 11px 17px;
-      border-radius: 999px;
+      width: 46px;
+      height: 46px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
       box-shadow: var(--shadow);
-      font-size: 0.8rem;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    /* muted: a slash across the note */
+    .music-control.off::after {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--dark-pink);
+      box-shadow: 0 0 0 1.5px #f7c5d2;
+      transform: rotate(-45deg);
     }
 
     .music-control:hover {
@@ -721,11 +753,6 @@
         font-size: 4.5rem;
       }
 
-      /* room above the stage for the letter that slides out of the envelope */
-      .stage {
-        margin-top: 110px;
-      }
-
       .envelope-wrap {
         transform: scale(0.85);
       }
@@ -751,6 +778,16 @@
 
       .message-paper {
         padding: 45px 7%;
+      }
+    }
+
+    @media (min-width: 761px) {
+      .cake-section {
+        gap: 80px;
+      }
+
+      .cake {
+        width: min(560px, 42vw, 68vh);
       }
     }
 
@@ -800,7 +837,7 @@
   <div id="main" hidden>
     <!-- music -->
     <audio id="bgMusic" loop preload="none"></audio>
-    <button class="music-control" id="musicButton" hidden>♫ Play Music</button>
+    <button class="music-control" id="musicButton" aria-label="Music" aria-pressed="false" hidden>♫</button>
 
     <!-- intro: letters from everyone -->
     <section class="section intro" id="intro">
@@ -815,7 +852,7 @@
             <h3 id="letterName"></h3>
             <p id="letterBody"></p>
           </div>
-          <div class="envelope" id="envelope">
+          <div class="envelope" id="envelope" tabindex="0" role="button" aria-label="Open or close the letter">
             <div class="envelope-flap"></div>
             <span class="envelope-from" id="envelopeFrom">for Julia ♡</span>
             <div class="envelope-seal">♡</div>
@@ -840,8 +877,11 @@
         <p class="note" id="letterNote" role="status"></p>
       </div>
 
-      <a class="next-arrow" href="#cake">⌄</a>
+      <a class="next-arrow" id="introArrow" href="#cake" hidden>⌄</a>
     </section>
+
+    <!-- Everything below stays hidden until Julia has opened every letter -->
+    <div id="afterLetters" hidden>
 
     <!-- cake -->
     <section class="section cake-section" id="cake">
@@ -852,7 +892,7 @@
 
       <div class="cake-area">
         <div class="cake" id="cakeGraphic">
-          <svg viewBox="0 0 400 380" class="cake-svg" role="img" aria-label="Birthday cake with three candles">
+          <svg viewBox="0 30 400 326" class="cake-svg" role="img" aria-label="Birthday cake with three candles">
             <defs>
               <linearGradient id="tierBottom" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0" stop-color="#fbc4d4"/>
@@ -874,9 +914,11 @@
             <ellipse cx="200" cy="338" rx="148" ry="10" fill="#d8b6c3" opacity="0.35"/>
             <ellipse cx="200" cy="330" rx="150" ry="17" fill="#ffffff" stroke="#e5cbd4" stroke-width="4"/>
             <ellipse cx="200" cy="326" rx="150" ry="13" fill="#fffdfb"/>
+            <!-- soft contact shadow: the cake sits ON the plate -->
+            <ellipse cx="200" cy="326" rx="112" ry="12" fill="#d8b6c3" opacity="0.5"/>
 
             <!-- bottom tier -->
-            <rect x="95" y="195" width="210" height="112" rx="16" fill="url(#tierBottom)" stroke="#e28ba3" stroke-width="3"/>
+            <path d="M95,211 Q95,195 111,195 L289,195 Q305,195 305,211 L305,318 A105,10 0 0 1 95,318 Z" fill="url(#tierBottom)" stroke="#e28ba3" stroke-width="3"/>
 
             <!-- bottom tier sprinkles -->
             <g>
@@ -905,17 +947,18 @@
               <rect x="201.9" y="164.9" width="7.0" height="3.5" rx="1.8" fill="#e98ba8" transform="rotate(212 205.4 166.7)"/>
               <rect x="151.1" y="178.1" width="6.0" height="3.0" rx="1.5" fill="#f6d36f" transform="rotate(248 154.1 179.6)"/>
               <rect x="233.4" y="179.2" width="6.0" height="3.0" rx="1.5" fill="#c8a4ed" transform="rotate(74 236.4 180.7)"/>
-              <rect x="187.6" y="185.9" width="7.0" height="3.5" rx="1.8" fill="#bfe3d8" transform="rotate(64 191.1 187.7)"/>
-              <rect x="185.9" y="192.3" width="6.0" height="3.0" rx="1.5" fill="#e98ba8" transform="rotate(97 188.9 193.8)"/>
+              <rect x="176.6" y="177.9" width="7.0" height="3.5" rx="1.8" fill="#bfe3d8" transform="rotate(64 180.1 179.7)"/>
+              <rect x="214.9" y="181.3" width="6.0" height="3.0" rx="1.5" fill="#e98ba8" transform="rotate(97 217.9 182.8)"/>
             </g>
 
             <!-- icing drips: bottom tier, draped over the seam -->
-            <path d="M80,188 L320,188 Q305,224 290,200 Q275,224 260,200 Q245,224 230,200 Q215,224 200,200 Q185,224 170,200 Q155,224 140,200 Q125,224 110,200 Q95,224 80,200 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
+            <path d="M80,190 L320,190 L320,214 Q305,238 290,214 Q275,238 260,214 Q245,238 230,214 Q215,238 200,214 Q185,238 170,214 Q155,238 140,214 Q125,238 110,214 Q95,238 80,214 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
 
             <!-- icing drips: top tier -->
-            <path d="M128,128 L272,128 Q257.6,152 243.2,134 Q228.8,152 214.4,134 Q200,152 185.6,134 Q171.2,152 156.8,134 Q142.4,152 128,134 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
+            <path d="M128,126 L272,126 L272,148 Q257.6,170 243.2,148 Q228.8,170 214.4,148 Q200,170 185.6,148 Q171.2,170 156.8,148 Q142.4,170 128,148 Z" fill="#fff9ed" stroke="#f3d5df" stroke-width="1.5"/>
 
-            <!-- candles -->
+            <!-- candles (pushed into the icing) -->
+            <g transform="translate(0,8)">
             <g class="candle">
               <rect x="164" y="72" width="14" height="56" rx="4" fill="url(#candleStripeA)"/>
               <rect x="164" y="80" width="14" height="7" fill="#fff" opacity="0.85"/>
@@ -936,6 +979,7 @@
               <rect x="222" y="100" width="14" height="7" fill="#fff" opacity="0.85"/>
               <rect x="222" y="120" width="14" height="7" fill="#fff" opacity="0.85"/>
               <path class="flame" d="M229,44 C236,54 236,64 229,70 C222,64 222,54 229,44 Z" fill="#ffd36e"/>
+            </g>
             </g>
           </svg>
         </div>
@@ -997,6 +1041,7 @@ Stay amazing. You deserve all the good things. ♡
         <p style="margin-top: 35px;">Made with love for Julia!</p>
       </div>
     </section>
+    </div><!-- /afterLetters -->
   </div>
 
   <script src="config.js"></script>
@@ -1023,6 +1068,12 @@ Stay amazing. You deserve all the good things. ♡
     let loadingLetters = false;
     let switching = false;
     let revealed = false;
+
+    // Lock: the cake, memories and final message stay hidden until every letter has been opened.
+    // (A UX lock, not security: the letters themselves are protected by the database.)
+    const opened = new Set();
+    let unlocked = false;
+    const unlockAll = !!(BD.preview && new URLSearchParams(location.search).get("unlock") === "1");
 
     // ---------- boot: countdown first, everything else only after ----------
     async function start() {
@@ -1075,6 +1126,8 @@ Stay amazing. You deserve all the good things. ♡
           : status.count + " letters are waiting for you";
       }
       if (withConfetti) createConfetti();
+      if (unlockAll) unlockRest();
+      startMusic();
     }
 
     $("retryButton").addEventListener("click", start);
@@ -1112,11 +1165,35 @@ Stay amazing. You deserve all the good things. ♡
 
     function startCarousel() {
       $("letterNav").hidden = letters.length <= 1;
-      $("stageHint").textContent = "Tap the heart to open each letter (long letters scroll)";
+      $("stageHint").textContent = "Tap the heart to open each letter.";
       $("introText").textContent = "Take your time. Read every one.";
       $("openButton").disabled = false;
       $("openButton").textContent = "Are you ready to make a wish?";
+      $("openButton").hidden = !unlocked;
       renderLetter(0, true);
+    }
+
+    function setOpen(flag) {
+      wrap.classList.toggle("open", flag);
+      if (flag) { opened.add(current); refreshProgress(); }
+    }
+
+    function refreshProgress() {
+      if (!loaded || unlocked) return;
+      if (opened.size >= letters.length) {
+        unlockRest();
+      } else {
+        $("letterNote").textContent = "Opened " + opened.size + " of " + letters.length + ". Open them all to continue.";
+      }
+    }
+
+    function unlockRest() {
+      if (unlocked) return;
+      unlocked = true;
+      $("afterLetters").hidden = false;
+      $("introArrow").hidden = false;
+      $("letterNote").textContent = "";
+      if (loaded) $("openButton").hidden = false;
     }
 
     function renderLetter(i, autoOpen) {
@@ -1131,7 +1208,7 @@ Stay amazing. You deserve all the good things. ♡
       $("letterCounter").textContent = (i + 1) + " / " + letters.length;
       $("prevButton").disabled = i === 0;
       $("nextButton").disabled = i === letters.length - 1;
-      if (autoOpen) setTimeout(() => wrap.classList.add("open"), 400);
+      if (autoOpen) setTimeout(() => { if (current === i) setOpen(true); }, 400);
     }
 
     async function goTo(i) {
@@ -1153,13 +1230,19 @@ Stay amazing. You deserve all the good things. ♡
       if (e.key === "ArrowRight") goTo(current + 1);
     });
 
-    $("envelope").addEventListener("click", () => {
+    function envelopeClick() {
       if (!loaded) { loadLetters(); return; }
-      wrap.classList.toggle("open");
+      setOpen(!wrap.classList.contains("open"));
+    }
+
+    $("envelope").addEventListener("click", envelopeClick);
+    $("envelope").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); envelopeClick(); }
     });
 
     $("openButton").addEventListener("click", () => {
       if (!loaded) { loadLetters(); return; }
+      if (!unlocked) return;
       $("cake").scrollIntoView({ behavior: "smooth" });
     });
 
@@ -1197,22 +1280,65 @@ Stay amazing. You deserve all the good things. ♡
     const APP = window.APP_CONFIG || {};
 
     // The song comes from config.js (a file in assets/music/). No song set = no button.
+    // Browsers refuse to play sound before the visitor has tapped something, so we try at once
+    // and, if refused, start on her very first tap ("Open my Letters"). The round button mutes.
+    let musicWanted = true;
+    let musicStarting = false;
+    const GESTURES = ["pointerdown", "pointerup", "touchend", "keydown", "click"];
+
+    function setMusicUi(playing) {
+      musicButton.classList.toggle("off", !playing);
+      musicButton.setAttribute("aria-pressed", String(playing));
+      musicButton.setAttribute("aria-label", playing ? "Mute music" : "Play music");
+      musicButton.title = playing ? "Mute music" : "Play music";
+    }
+
+    function onGesture(e) {
+      if (musicButton.contains(e.target)) return; // the button handles itself
+      startMusic();
+    }
+    function armGestures() {
+      GESTURES.forEach((t) => window.addEventListener(t, onGesture, { capture: true, passive: true }));
+    }
+    function disarmGestures() {
+      GESTURES.forEach((t) => window.removeEventListener(t, onGesture, { capture: true }));
+    }
+
+    async function startMusic() {
+      if (!APP.MUSIC || !musicWanted || !bgMusic.paused || musicStarting) return;
+      musicStarting = true;
+      try {
+        await bgMusic.play();
+        disarmGestures();
+        setMusicUi(true);
+      } catch (e) {
+        if (e && (e.name === "NotAllowedError" || e.name === "AbortError")) {
+          setMusicUi(false);
+          armGestures(); // try again on her next tap
+        } else {
+          disarmGestures(); // missing or unsupported file
+          musicButton.hidden = true;
+        }
+      } finally {
+        musicStarting = false;
+      }
+    }
+
     if (APP.MUSIC) {
       bgMusic.src = APP.MUSIC;
       musicButton.hidden = false;
+      setMusicUi(false);
     }
 
-    musicButton.addEventListener("click", async () => {
-      if (bgMusic.paused) {
-        try {
-          await bgMusic.play();
-          musicButton.textContent = "Ⅱ Pause Music";
-        } catch {
-          musicButton.textContent = "Music file not found";
-        }
-      } else {
+    musicButton.addEventListener("click", () => {
+      if (!bgMusic.paused) {
         bgMusic.pause();
-        musicButton.textContent = "♫ Play Music";
+        musicWanted = false;
+        disarmGestures();
+        setMusicUi(false);
+      } else {
+        musicWanted = true;
+        startMusic();
       }
     });
 

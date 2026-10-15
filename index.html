@@ -261,12 +261,12 @@
     <!-- countdown over, Julia hasn't opened her letters yet -->
     <section class="card center" id="waitCard" hidden>
       <h2>The countdown is over! 🎉</h2>
-      <p>Julia hasn't opened her letters yet. This page updates by itself, so keep it open ♡</p>
+      <p>Julia hasn't opened her letters yet. This page updates by itself, so keep it open.</p>
     </section>
 
     <!-- Julia opened her letters: everyone can read, nobody can interact -->
     <section id="wall" hidden>
-      <h2 class="wall-title">Julia's letters ♡</h2>
+      <h2 class="wall-title">Julia's Letters</h2>
       <p class="wall-sub" id="wallSub"></p>
       <div class="cards" id="cards"></div>
     </section>
@@ -317,8 +317,8 @@
       } catch (e) {
         if (first || !status) {
           showError(e.message === "not_configured"
-            ? "Setup isn't finished yet: config.js still needs the Supabase URL and key."
-            : "Couldn't connect right now. Please check your internet and refresh the page ♡");
+            ? "Setup isn't finished yet."
+            : "Couldn't connect right now. Please check your internet and refresh the page.");
         } else {
           schedulePoll(POLL_MS); // temporary hiccup: keep what's on screen, try again later
         }
@@ -356,7 +356,7 @@
         return;
       }
 
-      $("heroTitle").innerHTML = "Happy birthday,<br /><span>Julia!</span>";
+      $("heroTitle").innerHTML = "Happy Birthday,<br /><span>Julia!</span>";
 
       if (!status.opened) {
         setMode("waiting");
@@ -438,7 +438,7 @@
         await BD.rpc("add_message", { p_name: name, p_body: body }, { retry: false });
         bodyInput.value = "";
         $("counter").textContent = "0 / 1500";
-        setNote("Sent! Julia will read it on her birthday! You can write another one if you like.", "ok");
+        setNote("Sent! Julia will read it on her birthday! Secret muna natin 'to for now.", "ok");
         if (status) {
           status.count += 1;
           render();
