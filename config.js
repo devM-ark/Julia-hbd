@@ -17,6 +17,14 @@ window.APP_CONFIG = {
 	{ src: "assets/pictures/picture07.jpg",},
 	{ src: "assets/pictures/picture08.jpg",},
 	{ src: "assets/pictures/picture09.jpg",},
-	{ src: "assets/pictures/picture10.jpg"}
+	{ src: "assets/pictures/picture10.jpg",},
+	{ src: "assets/pictures/picture11.jpg",},
+	{ src: "assets/pictures/picture12.jpg",},
+	{ src: "assets/pictures/picture13.jpg",},
+	{ src: "assets/pictures/picture14.jpg",},
+	{ src: "assets/pictures/picture15.jpg",},
+	{ src: "assets/pictures/picture16.jpg",},
+	{ src: "assets/pictures/picture17.jpg",},
+	{ src: "assets/pictures/picture18.jpg"}
   ]
 };
